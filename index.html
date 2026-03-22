@@ -1,168 +1,294 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomodoro Focus App</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-
-        /* --- CSS Variables & Theming --- */
+        /* CSS Variables & Theming */
         :root {
-            --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --surface: rgba(255, 255, 255, 0.65);
-            --surface-border: rgba(255, 255, 255, 0.4);
-            --text-main: #2c3e50;
-            --text-muted: #7f8c8d;
-            --primary: #3498db;
-            --primary-glow: rgba(52, 152, 219, 0.6);
-            --break-color: #2ecc71;
-            --break-glow: rgba(46, 204, 113, 0.6);
-            --ring-bg: #ecf0f1;
-            --shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
-            --btn-hover: rgba(255, 255, 255, 0.9);
-            --transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            /* Light Theme (Default) */
+            --bg-base: #f0f4f8;
+            --blob-1: rgba(255, 182, 193, 0.6);
+            --blob-2: rgba(173, 216, 230, 0.6);
+            --blob-3: rgba(255, 255, 224, 0.6);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: rgba(0, 0, 0, 0.05);
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --primary-accent: #4a90e2;
+            --break-accent: #48bb78;
+            --ring-track: rgba(0, 0, 0, 0.05);
+            --button-hover: rgba(255, 255, 255, 0.9);
+            --button-active: rgba(255, 255, 255, 0.4);
         }
 
-        [data-theme="dark"] {
-            --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --surface: rgba(30, 41, 59, 0.75);
-            --surface-border: rgba(255, 255, 255, 0.1);
+        body.dark {
+            /* Dark Theme */
+            --bg-base: #0f172a;
+            --blob-1: rgba(56, 189, 248, 0.15);
+            --blob-2: rgba(167, 139, 250, 0.15);
+            --blob-3: rgba(45, 212, 191, 0.15);
+            --glass-bg: rgba(30, 41, 59, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.3);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.6);
-            --break-color: #10b981;
-            --break-glow: rgba(16, 185, 129, 0.6);
-            --ring-bg: #334155;
-            --shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-            --btn-hover: rgba(50, 65, 85, 0.9);
+            --primary-accent: #38bdf8;
+            --break-accent: #34d399;
+            --ring-track: rgba(255, 255, 255, 0.05);
+            --button-hover: rgba(51, 65, 85, 0.8);
+            --button-active: rgba(15, 23, 42, 0.6);
         }
 
-        /* --- Reset & Base --- */
+        /* Reset & Base Styles */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
         }
 
         body {
-            background: var(--bg-grad);
+            background-color: var(--bg-base);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: var(--transition);
             overflow: hidden;
             position: relative;
+            padding: 20px;
+            opacity: 0;
+            animation: fadeInPage 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Floating Background Shapes */
-        .bg-shape {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
-            animation: float 25s infinite alternate ease-in-out;
-            opacity: 0.6;
-            transition: var(--transition);
-        }
-        .shape1 { width: 350px; height: 350px; background: var(--primary); top: -100px; left: -100px; }
-        .shape2 { width: 450px; height: 450px; background: var(--break-color); bottom: -150px; right: -100px; animation-delay: -5s; }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -30px) scale(1.05); }
-            100% { transform: translate(-20px, 40px) scale(1); }
+        @keyframes fadeInPage {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- Main Layout --- */
-        .app-container {
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--surface-border);
-            border-radius: 35px;
-            padding: 45px 40px;
-            width: 90%;
-            max-width: 480px;
-            box-shadow: var(--shadow);
-            text-align: center;
-            position: relative;
-            animation: softEntrance 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), cardHoverFloat 8s ease-in-out infinite 1.2s;
-            transition: var(--transition);
-        }
-
-        @keyframes softEntrance {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes cardHoverFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        /* --- Header --- */
-        header { margin-bottom: 35px; position: relative; }
-        h1 { font-weight: 600; font-size: 2rem; margin-bottom: 8px; letter-spacing: -0.5px; }
-        p.subtitle { color: var(--text-muted); font-size: 1rem; font-weight: 300; }
-        
-        .theme-toggle {
+        /* Animated Background */
+        .bg-container {
             position: absolute;
             top: 0;
-            right: 0;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-main);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            filter: blur(80px);
+            pointer-events: none;
         }
-        .theme-toggle:hover { transform: scale(1.2) rotate(20deg); }
 
-        /* --- Presets --- */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 20s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            transition: animation-duration 2s ease;
+        }
+
+        body.state-focus .blob {
+            animation-duration: 12s; /* Faster, more active during focus */
+        }
+
+        body.state-break .blob {
+            animation-duration: 30s; /* Slower, calmer during break */
+        }
+
+        .blob-1 {
+            width: 50vw;
+            height: 50vw;
+            background: var(--blob-1);
+            top: -10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 60vw;
+            height: 60vw;
+            background: var(--blob-2);
+            bottom: -20%;
+            right: -10%;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 40vw;
+            height: 40vw;
+            background: var(--blob-3);
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Dark Mode Particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: particleMove 40s linear infinite;
+        }
+
+        body.dark .particles {
+            opacity: 1;
+        }
+
+        @keyframes particleMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px -100px; }
+        }
+
+        /* App Container (Glassmorphism) */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 40px 30px;
+            box-shadow: 0 25px 50px -12px var(--glass-shadow), 0 0 0 1px inset rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header */
+        header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: -5px;
+            right: 0;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-main);
+            background: var(--ring-track);
+            transform: scale(1.1);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .icon-moon { display: none; }
+        body.dark .icon-sun { display: none; }
+        body.dark .icon-moon { display: block; }
+
+        /* Presets */
         .presets {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 45px;
-        }
-        .preset-btn {
-            background: rgba(0,0,0,0.03);
-            border: 1px solid transparent;
-            padding: 14px;
-            border-radius: 18px;
-            cursor: pointer;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: var(--transition);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        }
-        [data-theme="dark"] .preset-btn { background: rgba(255,255,255,0.03); }
-        .preset-btn:hover { background: var(--btn-hover); transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        .preset-btn.active {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 8px 25px var(--primary-glow);
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 35px;
         }
 
-        /* --- Timer Display --- */
-        .timer-wrapper {
+        .preset-btn {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 0 auto 45px;
+            overflow: hidden;
+        }
+
+        .preset-btn:hover:not(:disabled) {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--glass-shadow);
+        }
+
+        .preset-btn:active:not(:disabled) {
+            transform: translateY(0);
+            background: var(--button-active);
+        }
+
+        .preset-btn.active {
+            background: var(--text-main);
+            color: var(--bg-base);
+            border-color: transparent;
+            box-shadow: 0 8px 20px var(--glass-shadow);
+        }
+
+        .preset-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Timer Display */
+        .timer-container {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin-bottom: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: var(--transition);
         }
 
         .timer-svg {
@@ -172,431 +298,517 @@
             width: 100%;
             height: 100%;
             transform: rotate(-90deg);
-            pointer-events: none;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.05));
         }
 
-        .timer-bg {
+        .timer-track {
             fill: none;
-            stroke: var(--ring-bg);
-            stroke-width: 6;
-            transition: stroke 0.5s ease;
+            stroke: var(--ring-track);
+            stroke-width: 8;
         }
 
         .timer-progress {
             fill: none;
-            stroke: var(--primary);
+            stroke: var(--primary-accent);
             stroke-width: 8;
             stroke-linecap: round;
-            stroke-dasharray: 848; /* 2 * pi * 135(r) */
+            stroke-dasharray: 785; /* 2 * PI * 125(r) */
             stroke-dashoffset: 0;
-            filter: drop-shadow(0 0 12px var(--primary-glow));
             transition: stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease;
         }
 
+        body.state-break .timer-progress {
+            stroke: var(--break-accent);
+        }
+
+        body.state-focus .timer-progress.running {
+            filter: drop-shadow(0 0 12px var(--primary-accent));
+        }
+
+        body.state-break .timer-progress.running {
+            filter: drop-shadow(0 0 12px var(--break-accent));
+        }
+
         .timer-content {
-            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            z-index: 2;
         }
 
         .time-display {
             font-size: 4.5rem;
-            font-weight: 600;
-            letter-spacing: -3px;
-            margin-bottom: 5px;
+            font-weight: 200;
+            letter-spacing: -0.04em;
             font-variant-numeric: tabular-nums;
-            transition: color 0.5s ease, transform 0.3s ease;
+            line-height: 1;
+            margin-bottom: 8px;
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
         }
 
-        .phase-display {
-            font-size: 1.15rem;
-            font-weight: 400;
+        .time-display.tick-anim {
+            transform: scale(1.03);
+            opacity: 0.8;
+        }
+
+        .phase-label {
+            font-size: 1rem;
+            font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 0.2em;
             transition: color 0.5s ease;
         }
 
-        /* States */
-        .is-focusing .timer-wrapper { animation: pulseFocus 3s infinite ease-in-out; }
-        .is-focusing .time-display { transform: scale(1.05); color: var(--primary); }
-        .is-break .timer-progress { stroke: var(--break-color); filter: drop-shadow(0 0 15px var(--break-glow)); }
-        .is-break .preset-btn.active { background: var(--break-color); box-shadow: 0 8px 25px var(--break-glow); }
-        .is-break .time-display { color: var(--break-color); }
-        .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+        body.state-focus .phase-label.running { color: var(--primary-accent); }
+        body.state-break .phase-label.running { color: var(--break-accent); }
 
-        @keyframes pulseFocus {
-            0% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
-            50% { transform: scale(1.03); filter: drop-shadow(0 0 20px var(--primary-glow)); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
-            40%, 60% { transform: translate3d(5px, 0, 0); }
-        }
-
-        /* --- Controls --- */
+        /* Controls */
         .controls {
             display: flex;
-            justify-content: center;
             gap: 20px;
+            width: 100%;
+            justify-content: center;
         }
 
         .control-btn {
-            border: none;
-            background: var(--surface);
-            border: 1px solid var(--surface-border);
-            color: var(--text-main);
-            padding: 16px 35px;
-            border-radius: 50px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: var(--glass-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--glass-shadow), 0 0 0 1px inset var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .control-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
         }
 
         .control-btn:hover {
-            background: var(--btn-hover);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px var(--glass-shadow), 0 0 0 1px inset var(--glass-border);
+            background: var(--button-hover);
         }
 
-        .control-btn:active { transform: translateY(1px) scale(0.98); }
+        .control-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
 
-        .btn-primary { background: var(--primary); color: white; border: none; }
-        .btn-primary:hover { background: #2980b9; box-shadow: 0 10px 25px var(--primary-glow); }
-        [data-theme="dark"] .btn-primary:hover { background: #2563eb; }
-
-        .is-break .btn-primary { background: var(--break-color); }
-        .is-break .btn-primary:hover { background: #27ae60; box-shadow: 0 10px 25px var(--break-glow); }
-        [data-theme="dark"] .is-break .btn-primary:hover { background: #059669; }
-
-        .control-btn svg { width: 20px; height: 20px; fill: currentColor; transition: transform 0.3s ease; }
-        .control-btn:hover svg { transform: scale(1.1); }
+        #start-btn.running svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
     </style>
 </head>
-<body>
+<body class="state-idle">
+    <!-- Animated Background Elements -->
+    <div class="bg-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <div class="particles"></div>
 
-    <!-- Background Decoration -->
-    <div class="bg-shape shape1"></div>
-    <div class="bg-shape shape2"></div>
+    <!-- Hidden Audio Elements -->
+    <!-- Note: audio1.mp4 and audio2.mp4 must be placed in the same directory as this file -->
+    <audio id="audio-zen" src="audio1.mp4" loop preload="auto"></audio>
+    <audio id="audio-alarm" src="audio2.mp4" preload="auto"></audio>
 
-    <div class="app-container" id="app-container">
+    <!-- Main App UI -->
+    <main class="app-container">
         <header>
             <h1>Pomodoro Focus</h1>
             <p class="subtitle">Focus deeply. Rest well.</p>
-            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">🌙</button>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+                <svg class="icon-sun" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="icon-moon" viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
         </header>
 
         <div class="presets" id="presets-container">
-            <!-- Populated via JS -->
+            <!-- Buttons rendered via JS -->
         </div>
 
-        <div class="timer-wrapper" id="timer-wrapper">
-            <svg class="timer-svg" viewBox="0 0 280 280">
-                <circle class="timer-bg" cx="140" cy="140" r="135"></circle>
-                <circle class="timer-progress" id="timer-progress" cx="140" cy="140" r="135"></circle>
+        <div class="timer-container">
+            <svg class="timer-svg" viewBox="0 0 260 260">
+                <circle class="timer-track" cx="130" cy="130" r="125"></circle>
+                <circle class="timer-progress" cx="130" cy="130" r="125" id="progress-ring"></circle>
             </svg>
             <div class="timer-content">
                 <div class="time-display" id="time-display">00:00</div>
-                <div class="phase-display" id="phase-display">Ready</div>
+                <div class="phase-label" id="phase-label">Ready</div>
             </div>
         </div>
 
         <div class="controls">
-            <button class="control-btn btn-primary" id="start-btn">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Start
+            <button class="control-btn" id="reset-btn" aria-label="Reset Timer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
             </button>
-            <button class="control-btn" id="pause-btn" style="display: none;">
-                <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Pause
-            </button>
-            <button class="control-btn" id="reset-btn">
-                <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Reset
+            <button class="control-btn" id="start-btn" aria-label="Start Timer">
+                <!-- Play Icon Default -->
+                <svg class="icon-play" viewBox="0 0 24 24">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
             </button>
         </div>
-    </div>
-
-    <!-- Hidden Audio Elements -->
-    <audio id="audio-zen" src="audio1.mp4" loop preload="auto"></audio>
-    <audio id="audio-alarm" src="audio2.mp4" preload="auto"></audio>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Configuration ---
-            const presets = [
-                { focus: 10 * 60, break: 2 * 60, label: '10 / 2' },
-                { focus: 15 * 60, break: 5 * 60, label: '15 / 5' },
-                { focus: 30 * 60, break: 10 * 60, label: '30 / 10' },
-                { focus: 45 * 60, break: 15 * 60, label: '45 / 15' }
+            // Configuration
+            const PRESETS = [
+                { id: 0, focus: 10, break: 2, label: '10 / 2' },
+                { id: 1, focus: 15, break: 5, label: '15 / 5' },
+                { id: 2, focus: 30, break: 10, label: '30 / 10' },
+                { id: 3, focus: 45, break: 15, label: '45 / 15' }
             ];
             
-            const circleRadius = 135;
-            const circumference = 2 * Math.PI * circleRadius; 
+            const RING_CIRCUMFERENCE = 2 * Math.PI * 125; // r=125 from SVG
 
-            // --- DOM Elements ---
-            const timeDisplay = document.getElementById('time-display');
-            const phaseDisplay = document.getElementById('phase-display');
-            const timerProgress = document.getElementById('timer-progress');
-            const appContainer = document.getElementById('app-container');
-            const presetsContainer = document.getElementById('presets-container');
-            
-            const btnStart = document.getElementById('start-btn');
-            const btnPause = document.getElementById('pause-btn');
-            const btnReset = document.getElementById('reset-btn');
-            const btnTheme = document.getElementById('theme-toggle');
+            // State
+            let state = {
+                currentPresetId: parseInt(localStorage.getItem('pomodoro_preset')) || 0,
+                phase: 'focus', // 'focus' | 'break' | 'transition'
+                status: 'idle', // 'idle' | 'running' | 'paused'
+                timeRemaining: 0, // in seconds
+                totalPhaseTime: 0, // in seconds
+                endTime: null, // timestamp for accurate calculation
+                timerRaf: null // requestAnimationFrame ID
+            };
 
-            const audioZen = document.getElementById('audio-zen');
-            const audioAlarm = document.getElementById('audio-alarm');
+            // DOM Elements
+            const DOM = {
+                body: document.body,
+                themeToggle: document.getElementById('theme-toggle'),
+                presetsContainer: document.getElementById('presets-container'),
+                timeDisplay: document.getElementById('time-display'),
+                phaseLabel: document.getElementById('phase-label'),
+                progressRing: document.getElementById('progress-ring'),
+                startBtn: document.getElementById('start-btn'),
+                resetBtn: document.getElementById('reset-btn'),
+                audioZen: document.getElementById('audio-zen'),
+                audioAlarm: document.getElementById('audio-alarm')
+            };
 
-            // --- State Variables ---
-            let currentPresetIndex = parseInt(localStorage.getItem('pomodoro_preset')) || 0;
-            if (currentPresetIndex < 0 || currentPresetIndex >= presets.length) currentPresetIndex = 0;
-            
-            let state = 'stopped'; 
-            let phase = 'focus'; 
-            let timeLeft = presets[currentPresetIndex].focus;
-            let totalTime = timeLeft;
-            let endTime = 0;
-            let timerInterval = null;
-            let audioFadeInterval = null;
+            // Audio icons mapping
+            const ICONS = {
+                play: '<polygon points="5 3 19 12 5 21 5 3"></polygon>',
+                pause: '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'
+            };
 
-            // --- Initialization ---
-            initTheme();
-            renderPresets();
-            updateDisplay(timeLeft);
-            timerProgress.style.strokeDasharray = circumference;
-            updateRing(1); 
+            // Initialization
+            function init() {
+                initTheme();
+                renderPresets();
+                loadPreset(state.currentPresetId);
+                updateUI();
+                setupEventListeners();
+            }
 
-            // --- Audio Functions ---
-            function playZen() {
-                audioZen.volume = 0;
-                let playPromise = audioZen.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(_ => fadeAudio(audioZen, 1.0, 2000)).catch(e => console.log("Autoplay blocked/Audio not found"));
+            // Theme Management
+            function initTheme() {
+                const savedTheme = localStorage.getItem('pomodoro_theme');
+                if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    DOM.body.classList.add('dark');
                 }
             }
 
-            function stopZen() {
-                fadeAudio(audioZen, 0, 1000, () => {
-                    audioZen.pause();
-                    audioZen.currentTime = 0;
+            function toggleTheme() {
+                DOM.body.classList.toggle('dark');
+                const isDark = DOM.body.classList.contains('dark');
+                localStorage.setItem('pomodoro_theme', isDark ? 'dark' : 'light');
+            }
+
+            // Presets Management
+            function renderPresets() {
+                DOM.presetsContainer.innerHTML = '';
+                PRESETS.forEach(preset => {
+                    const btn = document.createElement('button');
+                    btn.className = `preset-btn ${preset.id === state.currentPresetId ? 'active' : ''}`;
+                    btn.textContent = preset.label;
+                    btn.onclick = () => selectPreset(preset.id);
+                    DOM.presetsContainer.appendChild(btn);
                 });
             }
 
-            function playAlarm() {
-                audioAlarm.volume = 1.0;
-                audioAlarm.currentTime = 0;
-                let playPromise = audioAlarm.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(e => console.log("Autoplay blocked/Audio not found"));
+            function selectPreset(id) {
+                if (state.status === 'running') return; // Prevent change while running
+                state.currentPresetId = id;
+                localStorage.setItem('pomodoro_preset', id);
+                renderPresets();
+                state.phase = 'focus';
+                state.status = 'idle';
+                loadPreset(id);
+                updateUI();
+            }
+
+            function loadPreset(id) {
+                const preset = PRESETS.find(p => p.id === id);
+                state.totalPhaseTime = preset.focus * 60;
+                state.timeRemaining = state.totalPhaseTime;
+            }
+
+            // Timer Logic
+            function toggleTimer() {
+                if (state.status === 'transition') return;
+
+                if (state.status === 'running') {
+                    pauseTimer();
+                } else {
+                    startTimer();
                 }
             }
 
-            function fadeAudio(audio, targetVolume, duration, callback = null) {
-                if (audioFadeInterval) clearInterval(audioFadeInterval);
-                const steps = 20; 
-                const stepTime = duration / steps;
-                const volumeChange = (targetVolume - audio.volume) / steps;
-
-                audioFadeInterval = setInterval(() => {
-                    let newVolume = audio.volume + volumeChange;
-                    if ((volumeChange > 0 && newVolume >= targetVolume) || (volumeChange < 0 && newVolume <= targetVolume)) {
-                        audio.volume = targetVolume;
-                        clearInterval(audioFadeInterval);
-                        if (callback) callback();
-                    } else {
-                        audio.volume = Math.max(0, Math.min(1, newVolume));
-                    }
-                }, stepTime);
-            }
-
-            // --- Timer Logic ---
             function startTimer() {
-                if (state === 'running') return;
-                
-                if (state === 'stopped' || state === 'paused') {
-                    endTime = Date.now() + (timeLeft * 1000);
+                if (state.status === 'idle') {
+                    // Start of a fresh phase
+                    const preset = PRESETS.find(p => p.id === state.currentPresetId);
+                    state.totalPhaseTime = state.phase === 'focus' ? preset.focus * 60 : preset.break * 60;
+                    if (state.timeRemaining <= 0) state.timeRemaining = state.totalPhaseTime;
                 }
 
-                state = 'running';
-                btnStart.style.display = 'none';
-                btnPause.style.display = 'flex';
+                state.status = 'running';
+                state.endTime = Date.now() + (state.timeRemaining * 1000);
                 
-                if (phase === 'focus') {
-                    appContainer.classList.add('is-focusing');
-                    playZen();
+                DOM.body.classList.remove('state-idle');
+                DOM.body.classList.add(`state-${state.phase}`);
+                DOM.progressRing.classList.add('running');
+                DOM.phaseLabel.classList.add('running');
+                
+                DOM.startBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor">${ICONS.pause}</svg>`;
+                updatePresetsState(true);
+
+                // Audio Management
+                if (state.phase === 'focus') {
+                    playZenAudio();
                 }
 
-                phaseDisplay.textContent = phase === 'focus' ? 'Focusing...' : 'Break Time';
-                timerProgress.style.transition = 'stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease';
-                timerInterval = setInterval(tick, 100); 
+                tick();
+            }
+
+            function pauseTimer() {
+                state.status = 'paused';
+                cancelAnimationFrame(state.timerRaf);
+                
+                DOM.progressRing.classList.remove('running');
+                DOM.phaseLabel.classList.remove('running');
+                DOM.startBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor">${ICONS.play}</svg>`;
+                updatePresetsState(false);
+                
+                if (state.phase === 'focus') {
+                    pauseZenAudio();
+                }
+                updateUI();
+            }
+
+            function resetTimer() {
+                cancelAnimationFrame(state.timerRaf);
+                state.status = 'idle';
+                state.phase = 'focus';
+                
+                DOM.body.className = DOM.body.classList.contains('dark') ? 'dark state-idle' : 'state-idle';
+                DOM.progressRing.classList.remove('running');
+                DOM.phaseLabel.classList.remove('running');
+                DOM.startBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor">${ICONS.play}</svg>`;
+                updatePresetsState(false);
+
+                stopAudio();
+                loadPreset(state.currentPresetId);
+                updateUI();
             }
 
             function tick() {
-                const now = Date.now();
-                const remaining = Math.max(0, endTime - now);
-                const secondsLeft = Math.ceil(remaining / 1000);
+                if (state.status !== 'running') return;
 
-                if (secondsLeft !== timeLeft) {
-                    timeLeft = secondsLeft;
-                    updateDisplay(timeLeft);
+                const now = Date.now();
+                const remaining = Math.max(0, Math.ceil((state.endTime - now) / 1000));
+
+                if (remaining !== state.timeRemaining) {
+                    state.timeRemaining = remaining;
+                    updateUI();
+                    triggerTickAnimation();
                 }
 
-                const percentage = remaining / (totalTime * 1000);
-                updateRing(percentage);
-
-                if (remaining <= 0) {
+                if (state.timeRemaining <= 0) {
                     handlePhaseComplete();
+                } else {
+                    state.timerRaf = requestAnimationFrame(tick);
                 }
             }
 
             function handlePhaseComplete() {
-                clearInterval(timerInterval);
-                playAlarm();
-                
-                appContainer.classList.remove('is-focusing');
-                const timerWrapper = document.getElementById('timer-wrapper');
-                timerWrapper.classList.add('shake');
-                setTimeout(() => timerWrapper.classList.remove('shake'), 600);
+                state.status = 'transition';
+                cancelAnimationFrame(state.timerRaf);
+                DOM.progressRing.classList.remove('running');
+                updateUI();
 
-                if (phase === 'focus') {
-                    stopZen();
-                    phase = 'break';
-                    timeLeft = presets[currentPresetIndex].break;
-                    appContainer.classList.add('is-break');
-                } else {
-                    phase = 'focus';
-                    timeLeft = presets[currentPresetIndex].focus;
-                    appContainer.classList.remove('is-break');
-                }
-
-                totalTime = timeLeft;
-                updateDisplay(timeLeft);
-                updateRing(1);
-                
-                setTimeout(() => {
-                    if (state === 'running') {
-                        state = 'stopped'; 
-                        startTimer();
-                    }
-                }, 1500);
-            }
-
-            function pauseTimer() {
-                if (state !== 'running') return;
-                clearInterval(timerInterval);
-                state = 'paused';
-                appContainer.classList.remove('is-focusing');
-                
-                btnPause.style.display = 'none';
-                btnStart.style.display = 'flex';
-                btnStart.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Resume';
-                
-                phaseDisplay.textContent = 'Paused';
-                
-                if (phase === 'focus') {
-                    fadeAudio(audioZen, 0, 500, () => audioZen.pause());
-                }
-            }
-
-            function resetTimer() {
-                clearInterval(timerInterval);
-                state = 'stopped';
-                phase = 'focus';
-                timeLeft = presets[currentPresetIndex].focus;
-                totalTime = timeLeft;
-
-                appContainer.classList.remove('is-focusing', 'is-break');
-                
-                btnPause.style.display = 'none';
-                btnStart.style.display = 'flex';
-                btnStart.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Start';
-                
-                updateDisplay(timeLeft);
-                phaseDisplay.textContent = 'Ready';
-
-                timerProgress.style.transition = 'none';
-                updateRing(1);
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        timerProgress.style.transition = 'stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease';
+                if (state.phase === 'focus') {
+                    fadeOutZenAudio(() => {
+                        playAlarm(() => {
+                            switchPhase('break');
+                        });
                     });
-                });
-
-                if (audioFadeInterval) clearInterval(audioFadeInterval);
-                audioZen.pause();
-                audioZen.currentTime = 0;
-                audioAlarm.pause();
-                audioAlarm.currentTime = 0;
+                } else {
+                    playAlarm(() => {
+                        switchPhase('focus');
+                    });
+                }
             }
 
-            // --- UI Updates ---
-            function updateDisplay(seconds) {
-                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-                const s = (seconds % 60).toString().padStart(2, '0');
-                timeDisplay.textContent = `${m}:${s}`;
-                document.title = `${m}:${s} - Pomodoro`;
-            }
-
-            function updateRing(percentage) {
-                const p = Math.max(0, Math.min(1, percentage));
-                const offset = circumference - (p * circumference);
-                timerProgress.style.strokeDashoffset = offset;
-            }
-
-            function renderPresets() {
-                presetsContainer.innerHTML = '';
-                presets.forEach((preset, index) => {
-                    const btn = document.createElement('button');
-                    btn.className = `preset-btn ${index === currentPresetIndex ? 'active' : ''}`;
-                    btn.textContent = preset.label;
-                    btn.onclick = () => selectPreset(index);
-                    presetsContainer.appendChild(btn);
-                });
-            }
-
-            function selectPreset(index) {
-                if (state === 'running') return; 
-                currentPresetIndex = index;
-                localStorage.setItem('pomodoro_preset', index);
+            function switchPhase(newPhase) {
+                state.phase = newPhase;
+                state.status = 'idle';
                 
-                document.querySelectorAll('.preset-btn').forEach((btn, i) => {
-                    btn.classList.toggle('active', i === index);
-                });
+                DOM.body.className = DOM.body.classList.contains('dark') ? `dark state-${newPhase}` : `state-${newPhase}`;
                 
-                resetTimer();
+                const preset = PRESETS.find(p => p.id === state.currentPresetId);
+                state.totalPhaseTime = newPhase === 'focus' ? preset.focus * 60 : preset.break * 60;
+                state.timeRemaining = state.totalPhaseTime;
+                
+                updateUI();
+                // Auto-start next phase
+                setTimeout(startTimer, 500);
             }
 
-            // --- Theming ---
-            function initTheme() {
-                const savedTheme = localStorage.getItem('pomodoro_theme') || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                btnTheme.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            // UI Updates
+            function updateUI() {
+                // Time Text
+                const minutes = Math.floor(state.timeRemaining / 60);
+                const seconds = state.timeRemaining % 60;
+                DOM.timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                // Phase Label
+                let labelText = state.phase === 'focus' ? 'Focus' : 'Break';
+                if (state.status === 'paused') labelText = 'Paused';
+                if (state.status === 'idle' && state.timeRemaining === state.totalPhaseTime) labelText = 'Ready';
+                DOM.phaseLabel.textContent = labelText;
+
+                // Progress Ring
+                let progress = 0;
+                if (state.totalPhaseTime > 0) {
+                    // For countdown, we want the ring to deplete
+                    progress = state.timeRemaining / state.totalPhaseTime; 
+                }
+                const offset = RING_CIRCUMFERENCE - (progress * RING_CIRCUMFERENCE);
+                DOM.progressRing.style.strokeDashoffset = offset;
             }
 
-            function toggleTheme() {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('pomodoro_theme', next);
-                btnTheme.textContent = next === 'dark' ? '☀️' : '🌙';
+            function triggerTickAnimation() {
+                DOM.timeDisplay.classList.add('tick-anim');
+                setTimeout(() => DOM.timeDisplay.classList.remove('tick-anim'), 150);
             }
 
-            // --- Event Listeners ---
-            btnStart.addEventListener('click', startTimer);
-            btnPause.addEventListener('click', pauseTimer);
-            btnReset.addEventListener('click', resetTimer);
-            btnTheme.addEventListener('click', toggleTheme);
+            function updatePresetsState(disabled) {
+                const buttons = DOM.presetsContainer.querySelectorAll('button');
+                buttons.forEach(btn => btn.disabled = disabled);
+            }
+
+            // Audio Logic
+            function playZenAudio() {
+                DOM.audioZen.volume = 1;
+                DOM.audioZen.play().catch(e => console.log('Zen audio playback prevented (requires interaction)', e));
+            }
+
+            function pauseZenAudio() {
+                DOM.audioZen.pause();
+            }
+
+            function fadeOutZenAudio(callback) {
+                let vol = 1;
+                const fadeInterval = setInterval(() => {
+                    vol -= 0.1;
+                    if (vol <= 0) {
+                        clearInterval(fadeInterval);
+                        DOM.audioZen.pause();
+                        DOM.audioZen.volume = 1;
+                        DOM.audioZen.currentTime = 0;
+                        if (callback) callback();
+                    } else {
+                        DOM.audioZen.volume = vol;
+                    }
+                }, 100);
+            }
+
+            function playAlarm(callback) {
+                DOM.audioAlarm.currentTime = 0;
+                DOM.audioAlarm.volume = 1;
+                
+                const playPromise = DOM.audioAlarm.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // Sound playing successfully
+                        DOM.audioAlarm.onended = () => {
+                            if(callback) callback();
+                            DOM.audioAlarm.onended = null;
+                        };
+                        // Fallback in case onended doesn't fire
+                        setTimeout(() => {
+                            if(DOM.audioAlarm.onended) {
+                                DOM.audioAlarm.onended();
+                            }
+                        }, 5000);
+                    }).catch(error => {
+                        console.log('Alarm playback prevented', error);
+                        // If blocked, just proceed with phase switch immediately
+                        if(callback) callback();
+                    });
+                } else {
+                    if(callback) callback();
+                }
+            }
+
+            function stopAudio() {
+                DOM.audioZen.pause();
+                DOM.audioZen.currentTime = 0;
+                DOM.audioAlarm.pause();
+                DOM.audioAlarm.currentTime = 0;
+            }
+
+            // Event Listeners setup
+            function setupEventListeners() {
+                DOM.themeToggle.addEventListener('click', toggleTheme);
+                DOM.startBtn.addEventListener('click', toggleTimer);
+                DOM.resetBtn.addEventListener('click', resetTimer);
+                
+                // Keyboard accessibility
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        toggleTimer();
+                    }
+                });
+            }
+
+            // Boot
+            init();
         });
     </script>
 </body>
