@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Focus App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+        /* --- CSS Variables & Theming --- */
+        :root {
+            --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --surface: rgba(255, 255, 255, 0.65);
+            --surface-border: rgba(255, 255, 255, 0.4);
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --primary: #3498db;
+            --primary-glow: rgba(52, 152, 219, 0.6);
+            --break-color: #2ecc71;
+            --break-glow: rgba(46, 204, 113, 0.6);
+            --ring-bg: #ecf0f1;
+            --shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            --btn-hover: rgba(255, 255, 255, 0.9);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-grad: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+            --surface: rgba(30, 41, 59, 0.65);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.6);
+            --break-color: #10b981;
+            --break-glow: rgba(16, 185, 129, 0.6);
+            --ring-bg: #334155;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --btn-hover: rgba(50, 65, 85, 0.9);
+        }
+
+        /* --- Reset & Base --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-grad);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+            overflow: hidden; /* Prevent scroll from floating shapes */
+            position: relative;
+        }
+
+        /* Floating Background Shapes */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            animation: float 20s infinite alternate ease-in-out;
+            opacity: 0.5;
+        }
+        .shape1 { width: 300px; height: 300px; background: var(--primary); top: -100px; left: -100px; }
+        .shape2 { width: 400px; height: 400px; background: var(--break-color); bottom: -150px; right: -100px; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* --- Main Layout --- */
+        .app-container {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--surface-border);
+            border-radius: 30px;
+            padding: 40px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            animation: softEntrance 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes softEntrance {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Header --- */
+        header { margin-bottom: 30px; position: relative; }
+        h1 { font-weight: 600; font-size: 1.8rem; margin-bottom: 5px; letter-spacing: -0.5px; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; font-weight: 300; }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
+
+        /* --- Presets --- */
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .preset-btn {
+            background: rgba(0,0,0,0.05);
+            border: 1px solid transparent;
+            padding: 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        [data-theme="dark"] .preset-btn { background: rgba(255,255,255,0.05); }
+        .preset-btn:hover { background: var(--btn-hover); transform: translateY(-2px); }
+        .preset-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        /* --- Timer Display --- */
+        .timer-wrapper {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .timer-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg); /* Start at 12 o'clock */
+            pointer-events: none;
+        }
+
+        .timer-bg {
+            fill: none;
+            stroke: var(--ring-bg);
+            stroke-width: 8;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 785; /* 2 * pi * 125(r) */
+            stroke-dashoffset: 0;
+            filter: drop-shadow(0 0 10px var(--primary-glow));
+        }
+
+        /* Smooth transition for normal ticking, instantly jumps on reset */
+        .smooth-progress { transition: stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease; }
+
+        .timer-content {
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .time-display {
+            font-size: 4rem;
+            font-weight: 600;
+            letter-spacing: -2px;
+            margin-bottom: 5px;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.5s ease;
+        }
+
+        .phase-display {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.5s ease;
+        }
+
+        /* States */
+        .is-focusing .timer-wrapper { animation: pulseFocus 2s infinite ease-in-out; }
+        .is-break .timer-progress { stroke: var(--break-color); filter: drop-shadow(0 0 10px var(--break-glow)); }
+        .is-break .preset-btn.active { background: var(--break-color); box-shadow: 0 4px 15px var(--break-glow); }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes pulseFocus {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* --- Controls --- */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            border: none;
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: var(--btn-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .control-btn:active { transform: translateY(1px); }
+
+        .btn-primary { background: var(--primary); color: white; border: none; }
+        .btn-primary:hover { background: #2980b9; }
+        [data-theme="dark"] .btn-primary:hover { background: #2563eb; }
+
+        .is-break .btn-primary { background: var(--break-color); }
+        .is-break .btn-primary:hover { background: #27ae60; }
+        [data-theme="dark"] .is-break .btn-primary:hover { background: #059669; }
+
+        /* Icon styling inside buttons */
+        .control-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Decoration -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <div class="app-container" id="app-container">
+        <header>
+            <h1>Pomodoro Focus</h1>
+            <p class="subtitle">Focus deeply. Rest well.</p>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">🌙</button>
+        </header>
+
+        <div class="presets" id="presets-container">
+            <!-- Populated via JS -->
+        </div>
+
+        <div class="timer-wrapper" id="timer-wrapper">
+            <svg class="timer-svg" viewBox="0 0 260 260">
+                <circle class="timer-bg" cx="130" cy="130" r="125"></circle>
+                <circle class="timer-progress smooth-progress" id="timer-progress" cx="130" cy="130" r="125"></circle>
+            </svg>
+            <div class="timer-content">
+                <div class="time-display" id="time-display">00:00</div>
+                <div class="phase-display" id="phase-display">Ready</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn btn-primary" id="start-btn">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Start
+            </button>
+            <button class="control-btn" id="pause-btn" style="display: none;">
+                <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Pause
+            </button>
+            <button class="control-btn" id="reset-btn">
+                <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Reset
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden Audio Elements -->
+    <audio id="audio-zen" src="audio1.mp4" loop preload="auto"></audio>
+    <audio id="audio-alarm" src="audio2.mp4" preload="auto"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Configuration ---
+            const presets = [
+                { focus: 10 * 60, break: 2 * 60, label: '10 / 2' },
+                { focus: 15 * 60, break: 5 * 60, label: '15 / 5' },
+                { focus: 30 * 60, break: 10 * 60, label: '30 / 10' },
+                { focus: 45 * 60, break: 15 * 60, label: '45 / 15' }
+            ];
+            
+            const circleRadius = 125;
+            const circumference = 2 * Math.PI * circleRadius; // ~785
+
+            // --- DOM Elements ---
+            const timeDisplay = document.getElementById('time-display');
+            const phaseDisplay = document.getElementById('phase-display');
+            const timerProgress = document.getElementById('timer-progress');
+            const appContainer = document.getElementById('app-container');
+            const presetsContainer = document.getElementById('presets-container');
+            
+            const btnStart = document.getElementById('start-btn');
+            const btnPause = document.getElementById('pause-btn');
+            const btnReset = document.getElementById('reset-btn');
+            const btnTheme = document.getElementById('theme-toggle');
+
+            const audioZen = document.getElementById('audio-zen');
+            const audioAlarm = document.getElementById('audio-alarm');
+
+            // --- State Variables ---
+            let currentPresetIndex = parseInt(localStorage.getItem('pomodoro_preset')) || 0;
+            // Ensure bounds just in case
+            if (currentPresetIndex < 0 || currentPresetIndex >= presets.length) currentPresetIndex = 0;
+            
+            let state = 'stopped'; // 'stopped', 'running', 'paused'
+            let phase = 'focus'; // 'focus', 'break'
+            let timeLeft = presets[currentPresetIndex].focus;
+            let totalTime = timeLeft;
+            let endTime = 0;
+            let timerInterval = null;
+            let audioFadeInterval = null;
+
+            // --- Initialization ---
+            initTheme();
+            renderPresets();
+            updateDisplay(timeLeft);
+            timerProgress.style.strokeDasharray = circumference;
+            updateRing(1); // Full circle
+
+            // --- Audio Functions ---
+            function playZen() {
+                audioZen.volume = 0;
+                let playPromise = audioZen.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => fadeAudio(audioZen, 1.0, 2000)).catch(e => console.log("Autoplay blocked/Audio not found"));
+                }
+            }
+
+            function stopZen() {
+                fadeAudio(audioZen, 0, 1000, () => {
+                    audioZen.pause();
+                    audioZen.currentTime = 0;
+                });
+            }
+
+            function playAlarm() {
+                audioAlarm.volume = 1.0;
+                audioAlarm.currentTime = 0;
+                let playPromise = audioAlarm.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.log("Autoplay blocked/Audio not found"));
+                }
+            }
+
+            function fadeAudio(audio, targetVolume, duration, callback = null) {
+                if (audioFadeInterval) clearInterval(audioFadeInterval);
+                const steps = 20; // Updates per interval
+                const stepTime = duration / steps;
+                const volumeChange = (targetVolume - audio.volume) / steps;
+
+                audioFadeInterval = setInterval(() => {
+                    let newVolume = audio.volume + volumeChange;
+                    if ((volumeChange > 0 && newVolume >= targetVolume) || (volumeChange < 0 && newVolume <= targetVolume)) {
+                        audio.volume = targetVolume;
+                        clearInterval(audioFadeInterval);
+                        if (callback) callback();
+                    } else {
+                        // Clamp between 0 and 1 to avoid DOM exceptions
+                        audio.volume = Math.max(0, Math.min(1, newVolume));
+                    }
+                }, stepTime);
+            }
+
+            // --- Timer Logic ---
+            function startTimer() {
+                if (state === 'running') return;
+                
+                if (state === 'stopped' || state === 'paused') {
+                    endTime = Date.now() + (timeLeft * 1000);
+                }
+
+                state = 'running';
+                btnStart.style.display = 'none';
+                btnPause.style.display = 'flex';
+                
+                if (phase === 'focus') {
+                    appContainer.classList.add('is-focusing');
+                    playZen();
+                }
+
+                phaseDisplay.textContent = phase === 'focus' ? 'Focusing...' : 'Break Time';
+
+                // Sync ring transition class
+                timerProgress.classList.add('smooth-progress');
+
+                timerInterval = setInterval(tick, 100); // Run frequently for smooth ring update, but logic checks seconds
+            }
+
+            function tick() {
+                const now = Date.now();
+                const remaining = Math.max(0, endTime - now);
+                const secondsLeft = Math.ceil(remaining / 1000);
+
+                if (secondsLeft !== timeLeft) {
+                    timeLeft = secondsLeft;
+                    updateDisplay(timeLeft);
+                }
+
+                // Update ring smoothly
+                const percentage = remaining / (totalTime * 1000);
+                updateRing(percentage);
+
+                if (remaining <= 0) {
+                    handlePhaseComplete();
+                }
+            }
+
+            function handlePhaseComplete() {
+                clearInterval(timerInterval);
+                playAlarm();
+                
+                // Visual feedback
+                appContainer.classList.remove('is-focusing');
+                const timerWrapper = document.getElementById('timer-wrapper');
+                timerWrapper.classList.add('shake');
+                setTimeout(() => timerWrapper.classList.remove('shake'), 500);
+
+                if (phase === 'focus') {
+                    stopZen();
+                    phase = 'break';
+                    timeLeft = presets[currentPresetIndex].break;
+                    appContainer.classList.add('is-break');
+                } else {
+                    phase = 'focus';
+                    timeLeft = presets[currentPresetIndex].focus;
+                    appContainer.classList.remove('is-break');
+                }
+
+                totalTime = timeLeft;
+                updateDisplay(timeLeft);
+                updateRing(1);
+                
+                // Slight delay before auto-starting next phase
+                setTimeout(() => {
+                    if (state === 'running') {
+                        state = 'stopped'; // Reset temporarily to recalculate endTime
+                        startTimer();
+                    }
+                }, 1500);
+            }
+
+            function pauseTimer() {
+                if (state !== 'running') return;
+                clearInterval(timerInterval);
+                state = 'paused';
+                appContainer.classList.remove('is-focusing');
+                
+                btnPause.style.display = 'none';
+                btnStart.style.display = 'flex';
+                btnStart.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Resume';
+                
+                phaseDisplay.textContent = 'Paused';
+                
+                if (phase === 'focus') {
+                    fadeAudio(audioZen, 0, 500, () => audioZen.pause());
+                }
+            }
+
+            function resetTimer() {
+                clearInterval(timerInterval);
+                state = 'stopped';
+                phase = 'focus';
+                timeLeft = presets[currentPresetIndex].focus;
+                totalTime = timeLeft;
+
+                appContainer.classList.remove('is-focusing', 'is-break');
+                
+                btnPause.style.display = 'none';
+                btnStart.style.display = 'flex';
+                btnStart.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Start';
+                
+                updateDisplay(timeLeft);
+                phaseDisplay.textContent = 'Ready';
+
+                // Instantly snap ring back without transition
+                timerProgress.classList.remove('smooth-progress');
+                updateRing(1);
+                // Re-add transition class next frame
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        timerProgress.classList.add('smooth-progress');
+                    });
+                });
+
+                // Stop Audio completely
+                if (audioFadeInterval) clearInterval(audioFadeInterval);
+                audioZen.pause();
+                audioZen.currentTime = 0;
+                audioAlarm.pause();
+                audioAlarm.currentTime = 0;
+            }
+
+            // --- UI Updates ---
+            function updateDisplay(seconds) {
+                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                timeDisplay.textContent = `${m}:${s}`;
+                document.title = `${m}:${s} - Pomodoro`;
+            }
+
+            function updateRing(percentage) {
+                // Ensure percentage is between 0 and 1
+                const p = Math.max(0, Math.min(1, percentage));
+                const offset = circumference - (p * circumference);
+                timerProgress.style.strokeDashoffset = offset;
+            }
+
+            function renderPresets() {
+                presetsContainer.innerHTML = '';
+                presets.forEach((preset, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = `preset-btn ${index === currentPresetIndex ? 'active' : ''}`;
+                    btn.textContent = preset.label;
+                    btn.onclick = () => selectPreset(index);
+                    presetsContainer.appendChild(btn);
+                });
+            }
+
+            function selectPreset(index) {
+                if (state === 'running') return; // Don't change if running
+                currentPresetIndex = index;
+                localStorage.setItem('pomodoro_preset', index);
+                
+                document.querySelectorAll('.preset-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === index);
+                });
+                
+                resetTimer();
+            }
+
+            // --- Theming ---
+            function initTheme() {
+                const savedTheme = localStorage.getItem('pomodoro_theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                btnTheme.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('pomodoro_theme', next);
+                btnTheme.textContent = next === 'dark' ? '☀️' : '🌙';
+            }
+
+            // --- Event Listeners ---
+            btnStart.addEventListener('click', startTimer);
+            btnPause.addEventListener('click', pauseTimer);
+            btnReset.addEventListener('click', resetTimer);
+            btnTheme.addEventListener('click', toggleTheme);
+
+        });
+    </script>
+</body>
+</html>
