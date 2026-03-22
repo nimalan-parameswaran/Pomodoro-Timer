@@ -19,14 +19,14 @@
             --break-color: #2ecc71;
             --break-glow: rgba(46, 204, 113, 0.6);
             --ring-bg: #ecf0f1;
-            --shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            --shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
             --btn-hover: rgba(255, 255, 255, 0.9);
-            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         [data-theme="dark"] {
-            --bg-grad: linear-gradient(135deg, #141e30 0%, #243b55 100%);
-            --surface: rgba(30, 41, 59, 0.65);
+            --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --surface: rgba(30, 41, 59, 0.75);
             --surface-border: rgba(255, 255, 255, 0.1);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -35,7 +35,7 @@
             --break-color: #10b981;
             --break-glow: rgba(16, 185, 129, 0.6);
             --ring-bg: #334155;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
             --btn-hover: rgba(50, 65, 85, 0.9);
         }
 
@@ -56,7 +56,7 @@
             justify-content: center;
             align-items: center;
             transition: var(--transition);
-            overflow: hidden; /* Prevent scroll from floating shapes */
+            overflow: hidden;
             position: relative;
         }
 
@@ -64,44 +64,52 @@
         .bg-shape {
             position: absolute;
             border-radius: 50%;
-            filter: blur(60px);
+            filter: blur(80px);
             z-index: -1;
-            animation: float 20s infinite alternate ease-in-out;
-            opacity: 0.5;
+            animation: float 25s infinite alternate ease-in-out;
+            opacity: 0.6;
+            transition: var(--transition);
         }
-        .shape1 { width: 300px; height: 300px; background: var(--primary); top: -100px; left: -100px; }
-        .shape2 { width: 400px; height: 400px; background: var(--break-color); bottom: -150px; right: -100px; animation-delay: -5s; }
+        .shape1 { width: 350px; height: 350px; background: var(--primary); top: -100px; left: -100px; }
+        .shape2 { width: 450px; height: 450px; background: var(--break-color); bottom: -150px; right: -100px; animation-delay: -5s; }
 
         @keyframes float {
             0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 50px) scale(1.1); }
+            50% { transform: translate(30px, -30px) scale(1.05); }
+            100% { transform: translate(-20px, 40px) scale(1); }
         }
 
         /* --- Main Layout --- */
         .app-container {
             background: var(--surface);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--surface-border);
-            border-radius: 30px;
-            padding: 40px;
+            border-radius: 35px;
+            padding: 45px 40px;
             width: 90%;
             max-width: 480px;
             box-shadow: var(--shadow);
             text-align: center;
             position: relative;
-            animation: softEntrance 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation: softEntrance 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), cardHoverFloat 8s ease-in-out infinite 1.2s;
+            transition: var(--transition);
         }
 
         @keyframes softEntrance {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes cardHoverFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         /* --- Header --- */
-        header { margin-bottom: 30px; position: relative; }
-        h1 { font-weight: 600; font-size: 1.8rem; margin-bottom: 5px; letter-spacing: -0.5px; }
-        p.subtitle { color: var(--text-muted); font-size: 0.95rem; font-weight: 300; }
+        header { margin-bottom: 35px; position: relative; }
+        h1 { font-weight: 600; font-size: 2rem; margin-bottom: 8px; letter-spacing: -0.5px; }
+        p.subtitle { color: var(--text-muted); font-size: 1rem; font-weight: 300; }
         
         .theme-toggle {
             position: absolute;
@@ -112,46 +120,49 @@
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-main);
-            transition: transform 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
+        .theme-toggle:hover { transform: scale(1.2) rotate(20deg); }
 
         /* --- Presets --- */
         .presets {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 40px;
+            gap: 15px;
+            margin-bottom: 45px;
         }
         .preset-btn {
-            background: rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.03);
             border: 1px solid transparent;
-            padding: 12px;
-            border-radius: 15px;
+            padding: 14px;
+            border-radius: 18px;
             cursor: pointer;
             color: var(--text-main);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
             transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        [data-theme="dark"] .preset-btn { background: rgba(255,255,255,0.05); }
-        .preset-btn:hover { background: var(--btn-hover); transform: translateY(-2px); }
+        [data-theme="dark"] .preset-btn { background: rgba(255,255,255,0.03); }
+        .preset-btn:hover { background: var(--btn-hover); transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
         .preset-btn.active {
             background: var(--primary);
             color: #fff;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            box-shadow: 0 8px 25px var(--primary-glow);
             border-color: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
         }
 
         /* --- Timer Display --- */
         .timer-wrapper {
             position: relative;
-            width: 260px;
-            height: 260px;
-            margin: 0 auto 40px;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 45px;
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: var(--transition);
         }
 
         .timer-svg {
@@ -160,14 +171,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-            transform: rotate(-90deg); /* Start at 12 o'clock */
+            transform: rotate(-90deg);
             pointer-events: none;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.05));
         }
 
         .timer-bg {
             fill: none;
             stroke: var(--ring-bg);
-            stroke-width: 8;
+            stroke-width: 6;
+            transition: stroke 0.5s ease;
         }
 
         .timer-progress {
@@ -175,13 +188,11 @@
             stroke: var(--primary);
             stroke-width: 8;
             stroke-linecap: round;
-            stroke-dasharray: 785; /* 2 * pi * 125(r) */
+            stroke-dasharray: 848; /* 2 * pi * 135(r) */
             stroke-dashoffset: 0;
-            filter: drop-shadow(0 0 10px var(--primary-glow));
+            filter: drop-shadow(0 0 12px var(--primary-glow));
+            transition: stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease;
         }
-
-        /* Smooth transition for normal ticking, instantly jumps on reset */
-        .smooth-progress { transition: stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease; }
 
         .timer-content {
             z-index: 2;
@@ -191,47 +202,49 @@
         }
 
         .time-display {
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: 600;
-            letter-spacing: -2px;
+            letter-spacing: -3px;
             margin-bottom: 5px;
             font-variant-numeric: tabular-nums;
-            transition: color 0.5s ease;
+            transition: color 0.5s ease, transform 0.3s ease;
         }
 
         .phase-display {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 400;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             transition: color 0.5s ease;
         }
 
         /* States */
-        .is-focusing .timer-wrapper { animation: pulseFocus 2s infinite ease-in-out; }
-        .is-break .timer-progress { stroke: var(--break-color); filter: drop-shadow(0 0 10px var(--break-glow)); }
-        .is-break .preset-btn.active { background: var(--break-color); box-shadow: 0 4px 15px var(--break-glow); }
-        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        .is-focusing .timer-wrapper { animation: pulseFocus 3s infinite ease-in-out; }
+        .is-focusing .time-display { transform: scale(1.05); color: var(--primary); }
+        .is-break .timer-progress { stroke: var(--break-color); filter: drop-shadow(0 0 15px var(--break-glow)); }
+        .is-break .preset-btn.active { background: var(--break-color); box-shadow: 0 8px 25px var(--break-glow); }
+        .is-break .time-display { color: var(--break-color); }
+        .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
 
         @keyframes pulseFocus {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+            50% { transform: scale(1.03); filter: drop-shadow(0 0 20px var(--primary-glow)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
         }
 
         @keyframes shake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
             20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+            40%, 60% { transform: translate3d(5px, 0, 0); }
         }
 
         /* --- Controls --- */
         .controls {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .control-btn {
@@ -239,36 +252,36 @@
             background: var(--surface);
             border: 1px solid var(--surface-border);
             color: var(--text-main);
-            padding: 15px 30px;
+            padding: 16px 35px;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .control-btn:hover {
             background: var(--btn-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        .control-btn:active { transform: translateY(1px); }
+        .control-btn:active { transform: translateY(1px) scale(0.98); }
 
         .btn-primary { background: var(--primary); color: white; border: none; }
-        .btn-primary:hover { background: #2980b9; }
+        .btn-primary:hover { background: #2980b9; box-shadow: 0 10px 25px var(--primary-glow); }
         [data-theme="dark"] .btn-primary:hover { background: #2563eb; }
 
         .is-break .btn-primary { background: var(--break-color); }
-        .is-break .btn-primary:hover { background: #27ae60; }
+        .is-break .btn-primary:hover { background: #27ae60; box-shadow: 0 10px 25px var(--break-glow); }
         [data-theme="dark"] .is-break .btn-primary:hover { background: #059669; }
 
-        /* Icon styling inside buttons */
-        .control-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .control-btn svg { width: 20px; height: 20px; fill: currentColor; transition: transform 0.3s ease; }
+        .control-btn:hover svg { transform: scale(1.1); }
 
     </style>
 </head>
@@ -290,9 +303,9 @@
         </div>
 
         <div class="timer-wrapper" id="timer-wrapper">
-            <svg class="timer-svg" viewBox="0 0 260 260">
-                <circle class="timer-bg" cx="130" cy="130" r="125"></circle>
-                <circle class="timer-progress smooth-progress" id="timer-progress" cx="130" cy="130" r="125"></circle>
+            <svg class="timer-svg" viewBox="0 0 280 280">
+                <circle class="timer-bg" cx="140" cy="140" r="135"></circle>
+                <circle class="timer-progress" id="timer-progress" cx="140" cy="140" r="135"></circle>
             </svg>
             <div class="timer-content">
                 <div class="time-display" id="time-display">00:00</div>
@@ -327,8 +340,8 @@
                 { focus: 45 * 60, break: 15 * 60, label: '45 / 15' }
             ];
             
-            const circleRadius = 125;
-            const circumference = 2 * Math.PI * circleRadius; // ~785
+            const circleRadius = 135;
+            const circumference = 2 * Math.PI * circleRadius; 
 
             // --- DOM Elements ---
             const timeDisplay = document.getElementById('time-display');
@@ -347,11 +360,10 @@
 
             // --- State Variables ---
             let currentPresetIndex = parseInt(localStorage.getItem('pomodoro_preset')) || 0;
-            // Ensure bounds just in case
             if (currentPresetIndex < 0 || currentPresetIndex >= presets.length) currentPresetIndex = 0;
             
-            let state = 'stopped'; // 'stopped', 'running', 'paused'
-            let phase = 'focus'; // 'focus', 'break'
+            let state = 'stopped'; 
+            let phase = 'focus'; 
             let timeLeft = presets[currentPresetIndex].focus;
             let totalTime = timeLeft;
             let endTime = 0;
@@ -363,7 +375,7 @@
             renderPresets();
             updateDisplay(timeLeft);
             timerProgress.style.strokeDasharray = circumference;
-            updateRing(1); // Full circle
+            updateRing(1); 
 
             // --- Audio Functions ---
             function playZen() {
@@ -392,7 +404,7 @@
 
             function fadeAudio(audio, targetVolume, duration, callback = null) {
                 if (audioFadeInterval) clearInterval(audioFadeInterval);
-                const steps = 20; // Updates per interval
+                const steps = 20; 
                 const stepTime = duration / steps;
                 const volumeChange = (targetVolume - audio.volume) / steps;
 
@@ -403,7 +415,6 @@
                         clearInterval(audioFadeInterval);
                         if (callback) callback();
                     } else {
-                        // Clamp between 0 and 1 to avoid DOM exceptions
                         audio.volume = Math.max(0, Math.min(1, newVolume));
                     }
                 }, stepTime);
@@ -427,11 +438,8 @@
                 }
 
                 phaseDisplay.textContent = phase === 'focus' ? 'Focusing...' : 'Break Time';
-
-                // Sync ring transition class
-                timerProgress.classList.add('smooth-progress');
-
-                timerInterval = setInterval(tick, 100); // Run frequently for smooth ring update, but logic checks seconds
+                timerProgress.style.transition = 'stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease';
+                timerInterval = setInterval(tick, 100); 
             }
 
             function tick() {
@@ -444,7 +452,6 @@
                     updateDisplay(timeLeft);
                 }
 
-                // Update ring smoothly
                 const percentage = remaining / (totalTime * 1000);
                 updateRing(percentage);
 
@@ -457,11 +464,10 @@
                 clearInterval(timerInterval);
                 playAlarm();
                 
-                // Visual feedback
                 appContainer.classList.remove('is-focusing');
                 const timerWrapper = document.getElementById('timer-wrapper');
                 timerWrapper.classList.add('shake');
-                setTimeout(() => timerWrapper.classList.remove('shake'), 500);
+                setTimeout(() => timerWrapper.classList.remove('shake'), 600);
 
                 if (phase === 'focus') {
                     stopZen();
@@ -478,10 +484,9 @@
                 updateDisplay(timeLeft);
                 updateRing(1);
                 
-                // Slight delay before auto-starting next phase
                 setTimeout(() => {
                     if (state === 'running') {
-                        state = 'stopped'; // Reset temporarily to recalculate endTime
+                        state = 'stopped'; 
                         startTimer();
                     }
                 }, 1500);
@@ -520,17 +525,14 @@
                 updateDisplay(timeLeft);
                 phaseDisplay.textContent = 'Ready';
 
-                // Instantly snap ring back without transition
-                timerProgress.classList.remove('smooth-progress');
+                timerProgress.style.transition = 'none';
                 updateRing(1);
-                // Re-add transition class next frame
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        timerProgress.classList.add('smooth-progress');
+                        timerProgress.style.transition = 'stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease';
                     });
                 });
 
-                // Stop Audio completely
                 if (audioFadeInterval) clearInterval(audioFadeInterval);
                 audioZen.pause();
                 audioZen.currentTime = 0;
@@ -547,7 +549,6 @@
             }
 
             function updateRing(percentage) {
-                // Ensure percentage is between 0 and 1
                 const p = Math.max(0, Math.min(1, percentage));
                 const offset = circumference - (p * circumference);
                 timerProgress.style.strokeDashoffset = offset;
@@ -565,7 +566,7 @@
             }
 
             function selectPreset(index) {
-                if (state === 'running') return; // Don't change if running
+                if (state === 'running') return; 
                 currentPresetIndex = index;
                 localStorage.setItem('pomodoro_preset', index);
                 
@@ -596,7 +597,6 @@
             btnPause.addEventListener('click', pauseTimer);
             btnReset.addEventListener('click', resetTimer);
             btnTheme.addEventListener('click', toggleTheme);
-
         });
     </script>
 </body>
